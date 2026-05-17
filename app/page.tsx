@@ -17,8 +17,8 @@ export default function Home() {
       }}>
         <a href="mailto:lifeingrid01@gmail.com" style={{
           fontFamily: 'monospace',
-          fontSize: 13,
-          color: '#1A1A1A',
+          fontSize: 10,
+          color: '#999',
           letterSpacing: 1,
           textDecoration: 'none',
         }}>
@@ -26,13 +26,19 @@ export default function Home() {
         </a>
         <a href="tel:+9779869604267" style={{
           fontFamily: 'monospace',
-          fontSize: 13,
-          color: '#1A1A1A',
+          fontSize: 10,
+          color: '#999',
           letterSpacing: 1,
           textDecoration: 'none',
         }}>
           +977 9869604267
         </a>
+        <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#aaa', letterSpacing: 1 }}>powered by</span>
+          <a href="https://www.sambandha.co" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center' }}>
+            <img src="/assets/sambandha-logo.png" alt="Sambandha" style={{ height: 40, width: 'auto', opacity: 0.7 }} />
+          </a>
+        </div>
       </footer>
     </main>
   )
