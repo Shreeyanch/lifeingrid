@@ -15,6 +15,16 @@ export default function Home() {
         alignItems: 'center',
         gap: 10,
       }}>
+        <p style={{
+          fontFamily: 'monospace',
+          fontSize: 11,
+          color: '#1A1A1A',
+          letterSpacing: 2,
+          textTransform: 'uppercase',
+          marginBottom: 4,
+        }}>
+          Book us
+        </p>
         <a href="mailto:lifeingrid01@gmail.com" style={{
           fontFamily: 'monospace',
           fontSize: 10,
