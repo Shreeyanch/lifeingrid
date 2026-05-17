@@ -1,9 +1,11 @@
 import Hero from '@/app/components/Hero'
 import OurStory from '@/app/components/OurStory'
+import LiveFolderButton from '@/components/LiveFolderButton'
 
 export default function Home() {
   return (
     <main className="bg-[#F5F1EC]" style={{ margin: 0, padding: 0, gap: 0 }}>
+      <LiveFolderButton />
       <Hero />
       <OurStory />
       <footer style={{
