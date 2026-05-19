@@ -7,12 +7,15 @@ import Link from 'next/link'
 
 const spaceMono = Space_Mono({ subsets: ['latin'], weight: ['400', '700'] })
 
+const PHOTOS_PER_PAGE = 12
+
 export default function PhotoWall() {
   const [photos, setPhotos] = useState<{ url: string; taken_at: string }[]>([])
   const [isLive, setIsLive] = useState(false)
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
   const [selectedPhoto, setSelectedPhoto] = useState<{ url: string; taken_at: string } | null>(null)
   const [downloading, setDownloading] = useState(false)
+  const [page, setPage] = useState(1)
   const seenUrls = useRef<Set<string>>(new Set())
 
   const handleDownload = async (url: string, takenAt: string) => {
@@ -37,11 +40,11 @@ export default function PhotoWall() {
     try {
       const res = await fetch('https://photobooth-api-rust.vercel.app/api/photos')
       const data = await res.json()
-      const latest = data.photos.slice(0, 20)
+      const latest = data.photos
       const newPhotos = latest.filter((p: { url: string; taken_at: string }) => !seenUrls.current.has(p.url))
       if (newPhotos.length > 0) {
         newPhotos.forEach((p: { url: string; taken_at: string }) => seenUrls.current.add(p.url))
-        setPhotos(prev => [...newPhotos, ...prev].slice(0, 20))
+        setPhotos(prev => [...newPhotos, ...prev])
         setIsLive(true)
         setLastUpdated(new Date())
       }
@@ -158,7 +161,7 @@ export default function PhotoWall() {
         {/* Photo grid */}
         <div className="photo-grid">
           <AnimatePresence>
-            {photos.map((photo, i) => {
+            {photos.slice((page - 1) * PHOTOS_PER_PAGE, page * PHOTOS_PER_PAGE).map((photo, i) => {
               const rotation = (i % 2 === 0 ? 1 : -1) * (Math.random() * 3 + 1)
               return (
                 <motion.div
@@ -202,6 +205,53 @@ export default function PhotoWall() {
             })}
           </AnimatePresence>
         </div>
+
+        {/* Pagination */}
+        {photos.length > PHOTOS_PER_PAGE && (() => {
+          const totalPages = Math.ceil(photos.length / PHOTOS_PER_PAGE)
+          const delta = 1
+          const start = Math.max(1, page - delta)
+          const end = Math.min(totalPages, page + delta)
+          const visiblePages = Array.from({ length: end - start + 1 }, (_, i) => start + i)
+          const btnStyle = (active: boolean, disabled?: boolean) => ({
+            background: disabled ? '#E8E0D0' : active ? '#1A1A1A' : 'transparent',
+            color: disabled ? '#999' : active ? 'white' : '#666',
+            border: 'none',
+            borderRadius: active ? '50%' : 40,
+            width: active ? 32 : undefined,
+            height: active ? 32 : undefined,
+            padding: active ? '0' : '7px 14px',
+            fontSize: 10,
+            fontFamily: spaceMono.style.fontFamily,
+            letterSpacing: 1.5,
+            textTransform: 'uppercase' as const,
+            cursor: disabled ? 'default' : 'pointer',
+            fontWeight: active ? 700 : 400,
+            flexShrink: 0,
+          })
+          const goTo = (p: number) => { setPage(p); window.scrollTo({ top: 0, behavior: 'smooth' }) }
+          return (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '0 16px 60px', flexWrap: 'wrap' }}>
+              <button onClick={() => goTo(page - 1)} disabled={page === 1} style={btnStyle(false, page === 1)}>← Prev</button>
+
+              {start > 1 && <>
+                <button onClick={() => goTo(1)} style={btnStyle(false)}>1</button>
+                {start > 2 && <span style={{ color: '#999', fontSize: 10, fontFamily: spaceMono.style.fontFamily }}>…</span>}
+              </>}
+
+              {visiblePages.map(p => (
+                <button key={p} onClick={() => goTo(p)} style={{ ...btnStyle(p === page), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{p}</button>
+              ))}
+
+              {end < totalPages && <>
+                {end < totalPages - 1 && <span style={{ color: '#999', fontSize: 10, fontFamily: spaceMono.style.fontFamily }}>…</span>}
+                <button onClick={() => goTo(totalPages)} style={btnStyle(false)}>{totalPages}</button>
+              </>}
+
+              <button onClick={() => goTo(page + 1)} disabled={page === totalPages} style={btnStyle(false, page === totalPages)}>Next →</button>
+            </div>
+          )
+        })()}
       </div>
 
       {/* Lightbox */}
